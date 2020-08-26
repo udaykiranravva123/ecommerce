@@ -5,6 +5,7 @@ const _ = require("lodash");
 const { errorHandler } = require("../helpers/dbErrorHandler");
 const nodemailer = require("nodemailer");
 const { OAuth2Client } = require("google-auth-library");
+const Address = require("../models/address");
 
 // using promise
 exports.signup = (req, res) => {
@@ -21,6 +22,50 @@ exports.signup = (req, res) => {
     user.hashed_password = undefined;
     res.json({
       user
+    });
+  });
+};
+
+exports.getAddress = (req, res) => {
+  Address.find().exec((err, products) => {
+    if (err) {
+      return res.status(400).json({
+        error: "No address"
+      });
+    }
+    res.json(products);
+  });
+};
+
+exports.createaddresss = (req, res) => {
+  // console.log("req.body", req.body)
+  var address = new Address(req.body);
+  address.save((err, add) => {
+    if (err) {
+      Address.find()
+        .populate("user")
+        .exec((err, result) => {
+          if (err) {
+            return res.status(400).json({
+              error: "User not found"
+            });
+          }
+          const query = result[0]._id;
+          Address.updateOne(
+            { _id: query },
+            { $set: req.body },
+            (err, responce) => {
+              if (err) {
+                console.log("ERR", err);
+              } else {
+                console.log(responce);
+              }
+            }
+          );
+        });
+    }
+    res.status(200).json({
+      address
     });
   });
 };

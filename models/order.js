@@ -22,8 +22,16 @@ const OrderSchema = new mongoose.Schema(
     address: String,
     status: {
       type: String,
-      default: "Not processed",
-      enum: ["Not processed", "Processing", "Shipped", "Delivered", "Cancelled"] // enum means string objects
+      default: "Processing",
+      enum: [
+        "Processing",
+        "Delivery in 5 days",
+        "Delivery in 3 days",
+        "Ready to delivery by tommorrow",
+        "Shipped",
+        "Delivered",
+        "Cancelled"
+      ] // enum means string objects
     },
     updated: Date,
     user: { type: ObjectId, ref: "User" }
